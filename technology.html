@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The News Today - Technology News</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="assets/favicon_io/favicon.ico" type="image/x-icon">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <header>
+        <nav>
+            <label class="hamburger">
+                <input type="checkbox">
+                <svg viewBox="0 0 32 32">
+                  <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+                  <path class="line" d="M7 16 27 16"></path>
+                </svg>
+            </label>
+            <div class="logo"></div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="international.html">International</a></li>
+                <li><a href="business.html">Business</a></li>
+                <li><a href="sports.html">Sports</a></li>
+                <li><a href="entertainment.html">Entertainment</a></li>
+                <li><a href="technology.html" class="active">Technology</a></li>
+            </ul>
+            <div class="search">
+                <input type="search" id="search-query" placeholder="What news today?">
+                <button id="search-button"><i class="bx bx-search"></i></button>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <div class="hero-content">
+            <div class="heading">
+                <div id="date">
+                </div>
+                <h1>The News Today</h1>
+                <div class="weather"></div>
+            </div>
+            <div class="divider">
+                <div class="px3"></div>
+                <div class="px2"></div>
+            </div>
+            <div class="main-news">
+                <div>
+                    <img src="" alt="" class="hero-image">
+                </div>
+                <div class="main-content">
+                    <div class="headline">
+                        <h1 id="main-headline"></h1>
+                    </div>
+                    <h2 id="main-description"></h2>
+                    <p id="by-line"></p>
+                    <div class="read-more">
+                        <a id="main-link" href="#" target="_blank">Read More</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="trending">            
+            <div class="divider">
+                <div class="px3"></div>
+                <div class="px2"></div>
+            </div>
+            <h1 class="news-label">Trending news</h1>
+            <div class="container"></div>
+            <button id="load-more">Load More</button>
+        </div>
+    </main>
+    <footer>
+        <h1>Created by Apar Agarwal</h1>
+        <div class="social">
+            <a href="https://www.linkedin.com/in/aparagarwal/" target="_blank"><i class='bx bxl-linkedin-square'></i> LinkedIn</a>
+            <a href="https://github.com/AparAgarwal" target="_blank"><i class='bx bxl-github' ></i> Github</a>
+        </div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
