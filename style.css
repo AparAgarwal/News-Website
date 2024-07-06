@@ -221,6 +221,13 @@ ul li {
         font-weight: 500;
         margin: 10px;
         color: #dbdbdb;
+        /* CSS properties to limit description to 2-3 lines */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Number of lines to show */
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
     #by-line {
         margin: 0px 10px;
@@ -349,6 +356,7 @@ ul li {
     margin-bottom: 10px;
     display: -webkit-box;
     -webkit-line-clamp: 4;
+    line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -630,6 +638,7 @@ footer{
         margin-bottom: 5px;
         display: -webkit-box;
         -webkit-line-clamp: 4;
+        line-clamp: 4;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
@@ -688,5 +697,13 @@ footer{
         font-size: 1.3rem;
         padding: 0px 20px;
         top: -10px;
+    }
+    footer h1{
+        font-size: 1.5rem;
+    }
+    footer .social{
+        font-size: 1rem;
+        padding: 10px 0px 20px 0px;
+        gap: 30px;
     }
 }

@@ -9,41 +9,56 @@ let year = d.getFullYear();
 document.getElementById("date").innerHTML = `<h4>${day}, ${mname} ${date}, ${year}</h4><span>Today's Paper</span>`;
 
 // Fetching the news from the API
-const apiKey = 'cc249cca7d454e95a4715dcb38e05a0e';
+
+const apiKey = 'pub_479521869e790a727903df673ac804ca5f7dc';
 let country = 'in';
 const maxNews = 12;
 const loadMoreCount = 6;
 
 const active = document.querySelector('.active').innerHTML.toLowerCase();
-const category = active === 'home' ? 'general' : active === 'international' ? 'general' : active;
-if (active === 'international') {
-    country = 'us';
-}
+const category = active === 'home' ? 'top' : active === 'international' ? 'world' : active;
 
+let nextPageToken = '';
 
-async function fetchNews(query = '') {
+let allArticles = [];
+let displayedCount = 0;
+
+async function fetchNews(query = '', nextPage = '') {
     let url;
-    if (query) {
-        url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${apiKey}&pageSize=100`;
+    if (nextPage) {
+        if (query) {
+            url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=${encodeURIComponent(query)}&language=en&page=${nextPage}`;
+        } else {
+            url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&country=${country}&category=${category}&language=en&page=${nextPage}`;
+        }
     } else {
-        url = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=${apiKey}&pageSize=100`;
+        if (query) {
+            url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=${encodeURIComponent(query)}&language=en`;
+        } else {
+            url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&country=${country}&category=${category}&language=en`;
+        }
     }
+
+    console.log("Fetching news from URL:", url); // Debugging
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`Network response was not ok: ${response.statusText}`);
         }
         const data = await response.json();
-        if (!data || !data.articles) {
+        if (!data || !data.results || data.results.length === 0) {
             throw new Error('Invalid API response: Missing articles');
         }
 
-        const filteredArticles = data.articles.filter(article => (
-            article.title && article.description && article.urlToImage && article.source && article.url && article.title.trim() !== '' && article.description.trim() !== '' && article.urlToImage.trim() !== '' && article.source.name && article.source.name.trim() !== '' && article.url.trim() !== ''
+        nextPageToken = data.nextPage; // Update nextPageToken for pagination
+        console.log("Next Page Token:", nextPageToken); // Debugging
+
+        const filteredArticles = data.results.filter(article => (
+            article.title && article.description && article.image_url && article.source_id && article.link
         ));
 
-        filteredArticles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+        filteredArticles.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
         return filteredArticles;
     } catch (error) {
@@ -51,86 +66,93 @@ async function fetchNews(query = '') {
         return [];
     }
 }
+
+async function fetchEnoughArticles(query = '', requiredCount = maxNews+1) {
+    while (allArticles.length < requiredCount && nextPageToken !== null) {
+        const newArticles = await fetchNews(query, nextPageToken);
+        if (newArticles.length === 0) {
+            break;
+        }
+        allArticles = allArticles.concat(newArticles);
+    }
+    console.log(allArticles); // Debugging
+    return allArticles;
+}
+
+
+// display the news on the page
 function displayMainNews(articles) {
     const article = articles[0];
     const title = article.title;
     const description = article.description;
-    const image = article.urlToImage;
-    const source = article.source.name;
-    const link = article.url;
+    const image = article.image_url;
+    const source = article.source_id;
+    const link = article.link;
     document.querySelector('.hero-image').src = image || '';
     document.querySelector('.hero-image').alt = title;
     document.getElementById('main-headline').textContent = title;
     document.getElementById('main-description').textContent = description;
-    document.getElementById('by-line').innerHTML= `<b>Source: </b>${source}`;
+    document.getElementById('by-line').innerHTML = `<b>Source: </b>${source}`;
     document.getElementById('main-link').href = link;
 }
+
 function displayArticles(articles) {
     const trendingContainer = document.querySelector('.trending .container');
-
     articles.forEach(article => {
         const card = document.createElement('div');
         card.classList.add('card');
-
-        const title = article.title;
-        const description = article.description;
-        const image = article.urlToImage;
-        const alt = article.title;
-        const source = article.source.name;
-        const link = article.url;
-
+        const { title, description, image_url, source_id, link } = article;
         card.innerHTML = `<div class="news-image">
-            <img src="${image}" alt="${alt}">
+            <img src="${image_url}" alt="${title}">
         </div>
         <div class="news-content">
             <h1>${title}</h1>
             <p>${description}</p>
-            <p><strong>Source:</strong> ${source}</p>
+            <p><strong>Source:</strong> ${source_id}</p>
             <div class="read-more">
                 <hr>
                 <a href="${link}" target="_blank">Read More</a>
             </div>
         </div>`;
-
         trendingContainer.appendChild(card);
     });
 }
 
-let allArticles = [];
-let displayedCount = 0;
+// initialize the page
+async function init(query = '') {
+    allArticles = await fetchEnoughArticles(query);
+    if (!query) {
+        displayMainNews(allArticles);
+        displayArticles(allArticles.slice(1, maxNews + 1));
+    } else {
+        displayArticles(allArticles.slice(0, maxNews));
+    }
+    displayedCount = maxNews+1;
+    
+    document.getElementById('load-more').style.display = 'block';
+}
 
-document.getElementById('load-more').addEventListener('click', function() {
-    displayedCount += loadMoreCount;
-    const moreArticles = allArticles.slice(displayedCount, displayedCount + loadMoreCount);
-    displayArticles(moreArticles);
+// load more articles
+document.getElementById('load-more').addEventListener('click', async function() {
+    while (displayedCount + loadMoreCount > allArticles.length && nextPageToken !== null) {
+        const loadMoreArticles = await fetchNews('', nextPageToken);
+        allArticles = allArticles.concat(loadMoreArticles);
+    }
+    const articlesToDisplay = allArticles.slice(displayedCount, displayedCount + loadMoreCount);
+    
+    console.log(allArticles); // Debugging
 
-    if (displayedCount + loadMoreCount >= allArticles.length) {
+    displayArticles(articlesToDisplay);
+    displayedCount += articlesToDisplay.length;
+    if (!nextPageToken && displayedCount >= allArticles.length) {
         this.style.display = 'none';
     }
 });
 
-async function init(query = '') {
-    allArticles = await fetchNews(query);
-    if(!query){
-        displayMainNews(allArticles);
-        displayArticles(allArticles.slice(1, maxNews+1));
-    }else{
-        displayArticles(allArticles.slice(0, maxNews));
-    }
-    displayedCount = maxNews;
-
-    if (displayedCount >= allArticles.length) {
-        document.getElementById('load-more').style.display = 'none';
-    } else {
-        document.getElementById('load-more').style.display = 'block';
-    }
-}
-
-// Initialize with default articles
-document.addEventListener('DOMContentLoaded', function () {
+// search functionality
+document.addEventListener('DOMContentLoaded', function() {
     const params = new URLSearchParams(window.location.search);
     const searchQuery = params.get('q');
-
     if (searchQuery) {
         document.getElementById('search-results-label').textContent = `Search Results for "${searchQuery}"`;
         document.getElementById('search-query').value = '';
@@ -140,57 +162,52 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Search functionality
-function performSearch() {
+document.getElementById('search-button').addEventListener('click', () => {
     const query = document.getElementById('search-query').value.trim();
     if (query) {
         document.getElementById('search-query').value = '';
         window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
     }
-}
+});
 
-document.getElementById('search-button').addEventListener('click', performSearch);
-
-document.getElementById('search-query').addEventListener('keypress', function(event) {
+document.getElementById('search-query').addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
-        performSearch();
+        const query = document.getElementById('search-query').value.trim();
+        if (query) {
+            document.getElementById('search-query').value = '';
+            window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
+        }
     }
 });
 
-// for smaller screens
-document.addEventListener('DOMContentLoaded', function () {
-    const hamburger = document.querySelector('.hamburger input');
+document.querySelector('.hamburger input').addEventListener('change', function() {
     const navUl = document.querySelector('nav ul');
-
-    hamburger.addEventListener('change', function () {
-        if (this.checked) {
-            navUl.classList.add('show');
-            navUl.classList.remove('hide');
-        } else {
-            navUl.classList.add('hide');
-            navUl.classList.remove('show');
-        }
-    });
+    if (this.checked) {
+        navUl.classList.add('show');
+        navUl.classList.remove('hide');
+    } else {
+        navUl.classList.add('hide');
+        navUl.classList.remove('show');
+    }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.querySelector('.search').addEventListener('click', () => {
     const searchBar = document.querySelector('.search');
     const searchButton = document.getElementById('search-button');
     const searchInput = document.getElementById('search-query');
+    searchBar.classList.toggle('search-expanded');
+    if (searchBar.classList.contains('search-expanded')) {
+        searchInput.focus();
+    } else {
+        searchInput.blur();
+    }
+});
 
-    searchButton.addEventListener('click', () => {
-        searchBar.classList.toggle('search-expanded');
-        if (searchBar.classList.contains('search-expanded')) {
-            searchInput.focus();
-        } else {
-            searchInput.blur();
-        }
-    });
-
-    document.addEventListener('click', (event) => {
-        if (!searchBar.contains(event.target) && searchBar.classList.contains('search-expanded')) {
-            searchBar.classList.remove('search-expanded');
-            searchInput.blur();
-        }
-    });
+document.addEventListener('click', (event) => {
+    const searchBar = document.querySelector('.search');
+    const searchInput = document.getElementById('search-query');
+    if (!searchBar.contains(event.target) && searchBar.classList.contains('search-expanded')) {
+        searchBar.classList.remove('search-expanded');
+        searchInput.blur();
+    }
 });
