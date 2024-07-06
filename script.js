@@ -27,13 +27,13 @@ async function fetchNews(query = '', nextPage = '') {
     let url;
     if (nextPage) {
         if (query) {
-            url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=${encodeURIComponent(query)}&language=en&page=${nextPage}`;
+            url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&qInTitle="${encodeURIComponent(query)}"&language=en&page=${nextPage}`;
         } else {
             url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&country=${country}&category=${category}&language=en&page=${nextPage}`;
         }
     } else {
         if (query) {
-            url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&q=${encodeURIComponent(query)}&language=en`;
+            url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&qInTitle="${encodeURIComponent(query)}"&language=en`;
         } else {
             url = `https://newsdata.io/api/1/latest?apikey=${apiKey}&country=${country}&category=${category}&language=en`;
         }
