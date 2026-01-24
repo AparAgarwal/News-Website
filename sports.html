@@ -4,7 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="/News-Website/">
+    <script>
+        if (window.location.hostname.includes('github.io') || window.location.hostname === 'aparagarwal.tech') {
+            const base = document.createElement('base');
+            base.href = '/News-Website/';
+            document.head.appendChild(base);
+        }
+    </script>
     <title>The News Today - Sports News</title>
 
     <link rel="stylesheet" href="css/style.css">

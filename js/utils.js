@@ -63,11 +63,11 @@ function createNewsCardSafe(article) {
     if (image_url && typeof image_url === 'string') {
         img.src = image_url;
         img.onerror = function () {
-            this.src = 'assets/placeholder.jpg'; // Fallback image
-            this.onerror = null; // Prevent infinite loop
+            this.src = 'assets/placeholder.svg';
+            this.onerror = null;
         };
     } else {
-        img.src = 'assets/placeholder.jpg';
+        img.src = 'assets/placeholder.svg';
     }
 
     imageDiv.appendChild(img);
@@ -128,8 +128,7 @@ function createNewsCardSafe(article) {
  * @returns {string} - Data URL for placeholder image
  */
 function getPlaceholderImage() {
-    // Simple gray placeholder (1x1 pixel, can be replaced with actual placeholder)
-    return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300"%3E%3Crect width="400" height="300" fill="%23e0e0e0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23999"%3ENo Image%3C/text%3E%3C/svg%3E';
+    return 'assets/placeholder.svg';
 }
 
 /**
