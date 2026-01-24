@@ -32,26 +32,24 @@ let displayedCount = 0;
 
 async function fetchNews(query = '', nextPage = '') {
     let url;
-    
+
     // Build API request URL using Vercel proxy
     const params = new URLSearchParams({
         language: 'en'
     });
-    
+
     if (query) {
         params.append('qInTitle', encodeURIComponent(query));
     } else {
         params.append('country', country);
         params.append('category', category);
     }
-    
+
     if (nextPage) {
         params.append('page', nextPage);
     }
-    
-    url = `${VERCEL_FUNCTION_URL}?${params.toString()}`;
 
-    console.log("Fetching news from Vercel proxy..."); // Debugging
+    url = `${VERCEL_FUNCTION_URL}?${params.toString()}`;
 
     try {
         const response = await fetch(url);
@@ -60,12 +58,10 @@ async function fetchNews(query = '', nextPage = '') {
         }
         const data = await response.json();
         if (!data || !data.results || data.results.length === 0) {
-            console.warn('No articles found in API response');
             return [];
         }
 
-        nextPageToken = data.nextPage; // Update nextPageToken for pagination
-        console.log("Next Page Token:", nextPageToken); // Debugging
+        nextPageToken = data.nextPage;
 
         const filteredArticles = data.results.filter(article => (
             article.title && article.description && article.image_url && article.source_id && article.link
@@ -84,21 +80,18 @@ async function fetchNews(query = '', nextPage = '') {
     }
 }
 
-async function fetchEnoughArticles(query = '', requiredCount = maxNews+1) {
+async function fetchEnoughArticles(query = '', requiredCount = maxNews + 1) {
     while (allArticles.length < requiredCount && nextPageToken !== null) {
         const newArticles = await fetchNews(query, nextPageToken);
         if (newArticles.length === 0) {
             break;
         }
         allArticles = allArticles.concat(newArticles);
-        
-        // SECURITY FIX: Prevent unbounded memory growth
+
         if (allArticles.length > MAX_ARTICLES) {
-            console.warn(`Article limit reached (${MAX_ARTICLES}). Stopping fetch.`);
             break;
         }
     }
-    console.log(allArticles); // Debugging
     return allArticles;
 }
 
@@ -109,42 +102,42 @@ function displayMainNews(articles) {
         console.error('No articles to display');
         return;
     }
-    
+
     const article = articles[0];
     const title = article.title;
     const description = article.description;
     const image = article.image_url;
     const source = article.source_id;
     const link = article.link;
-    
+
     // SECURITY FIX: Safely set image with error handling
     const heroImage = document.querySelector('.hero-image');
     if (heroImage) {
         heroImage.src = image || getPlaceholderImage();
         heroImage.alt = title || 'News image';
-        heroImage.onerror = function() {
+        heroImage.onerror = function () {
             this.src = getPlaceholderImage();
             this.onerror = null;
         };
     }
-    
+
     // SECURITY FIX: Use textContent instead of innerHTML
     const mainHeadline = safeGetElement('main-headline');
     if (mainHeadline) {
         mainHeadline.textContent = title || 'No title available';
     }
-    
+
     const mainDescription = safeGetElement('main-description');
     if (mainDescription) {
         mainDescription.textContent = description || 'No description available';
     }
-    
+
     // SECURITY FIX: Use textContent to prevent XSS
     const byLine = safeGetElement('by-line');
     if (byLine) {
         byLine.textContent = `Source: ${source || 'Unknown'}`;
     }
-    
+
     // SECURITY FIX: Validate URL before setting href
     const mainLink = safeGetElement('main-link');
     if (mainLink) {
@@ -166,7 +159,7 @@ function displayArticles(articles) {
         console.error('Trending container not found');
         return;
     }
-    
+
     articles.forEach(article => {
         // Use safe card creation function from utils.js
         const card = createNewsCardSafe(article);
@@ -181,33 +174,33 @@ async function init(query = '') {
     allArticles = [];
     displayedCount = 0;
     nextPageToken = '';
-    
+
     const mainContainer = document.querySelector('main');
     if (mainContainer) {
         showLoading(mainContainer);
     }
-    
+
     allArticles = await fetchEnoughArticles(query);
-    
+
     if (mainContainer) {
         hideLoading();
     }
-    
+
     if (allArticles.length === 0) {
         if (mainContainer) {
             showError('No articles found. Please try again later.', mainContainer);
         }
         return;
     }
-    
+
     if (!query) {
         displayMainNews(allArticles);
         displayArticles(allArticles.slice(1, maxNews + 1));
     } else {
         displayArticles(allArticles.slice(0, maxNews));
     }
-    displayedCount = maxNews+1;
-    
+    displayedCount = maxNews + 1;
+
     const loadMoreBtn = safeGetElement('load-more');
     if (loadMoreBtn) {
         loadMoreBtn.style.display = 'block';
@@ -220,36 +213,34 @@ let isLoadingMore = false;
 // load more articles
 const loadMoreBtn = safeGetElement('load-more');
 if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', async function() {
-        // Prevent multiple simultaneous requests
+    loadMoreBtn.addEventListener('click', async function () {
         if (isLoadingMore) {
-            console.log('Already loading more articles...');
             return;
         }
-        
+
         isLoadingMore = true;
         this.disabled = true;
         this.textContent = 'Loading...';
-        
+
         try {
             while (displayedCount + loadMoreCount > allArticles.length && nextPageToken !== null) {
                 const loadMoreArticles = await fetchNews('', nextPageToken);
                 allArticles = allArticles.concat(loadMoreArticles);
-                
+
                 // Prevent unbounded growth
                 if (allArticles.length > MAX_ARTICLES) {
                     console.warn('Maximum article limit reached');
                     break;
                 }
             }
-            
+
             const articlesToDisplay = allArticles.slice(displayedCount, displayedCount + loadMoreCount);
-            
+
             console.log(allArticles); // Debugging
 
             displayArticles(articlesToDisplay);
             displayedCount += articlesToDisplay.length;
-            
+
             if (!nextPageToken && displayedCount >= allArticles.length) {
                 this.style.display = 'none';
             }
@@ -265,7 +256,7 @@ if (loadMoreBtn) {
 }
 
 // search functionality
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const params = new URLSearchParams(window.location.search);
     const searchQuery = params.get('q');
     if (searchQuery) {
@@ -312,7 +303,7 @@ if (searchQueryInput) {
 
 const hamburgerInput = document.querySelector('.hamburger input');
 if (hamburgerInput) {
-    hamburgerInput.addEventListener('change', function() {
+    hamburgerInput.addEventListener('change', function () {
         const navUl = document.querySelector('nav ul');
         if (navUl) {
             if (this.checked) {

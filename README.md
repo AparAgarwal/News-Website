@@ -29,18 +29,22 @@ A clean, modern, and secure news aggregation website built with HTML, CSS, and J
 
 ## 🚀 Live Demo
 
-> **Note:** This is the original creator's deployment. To use this application, you must fork the repository and deploy your own instance with your own API key and Vercel URL. See setup instructions below.
+> **Note:** This project uses a hybrid deployment strategy:
+> - **Frontend**: Hosted on GitHub Pages at custom domain
+> - **API Proxy**: Deployed on Vercel (keeps API key secure)
 
-**Original Demo:** [http://news-website-kohl-chi.vercel.app/](http://news-website-kohl-chi.vercel.app/)
+**Live Site:** [https://aparagarwal.tech/News-Website/](https://aparagarwal.tech/News-Website/)
 
-**GitHub Pages:** [https://aparagarwal.github.io/News-Website/](https://aparagarwal.github.io/News-Website/)
+**Vercel API Demo:** [http://news-website-kohl-chi.vercel.app/](http://news-website-kohl-chi.vercel.app/)
+
+> To deploy your own instance, you'll need your own NewsData.io API key and Vercel deployment. See [Installation & Setup](#-installation--setup) below.
 
 ## 🛠️ Tech Stack
 
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
 - **API:** [NewsData.io](https://newsdata.io/)
-- **Deployment:** GitHub Pages / Vercel
-- **Serverless Functions:** Vercel Functions (for API proxy)
+- **Frontend Hosting:** GitHub Pages (custom domain)
+- **API Proxy:** Vercel Serverless Functions
 
 ## 📁 Project Structure
 
@@ -153,17 +157,19 @@ Vercel will automatically redeploy with your changes!
 
 Visit your Vercel URL: `https://your-news-app.vercel.app` 🎉
 
-### Option 2: Local Development Only
+### Option 2: Local Development
 
-For quick local testing (without Vercel):
+For local testing and development, see the comprehensive guide:
 
-1. Clone the repository
-2. Get your NewsData.io API key
-3. You'll need to either:
-   - Set up Vercel deployment (recommended), OR
-   - Temporarily use direct API calls (not recommended for production)
+**📘 [Local Setup Guide](docs/LOCAL_SETUP.md)**
 
-> **Note:** The application is designed to work with Vercel's serverless functions for secure API key storage. Local-only testing requires additional configuration.
+The local setup guide covers:
+- Running the project locally with Live Server or Python HTTP server
+- Testing features during development
+- Troubleshooting common issues
+- Development workflow and best practices
+
+> **Note:** Local development automatically uses the deployed Vercel API proxy, so you don't need to set up environment variables locally.
 
 For detailed deployment instructions, see: **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**
 

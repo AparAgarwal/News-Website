@@ -9,7 +9,7 @@ function isValidURL(url) {
     if (!url || typeof url !== 'string') {
         return false;
     }
-    
+
     try {
         const urlObj = new URL(url);
         // Only allow http and https protocols
@@ -25,11 +25,7 @@ function isValidURL(url) {
  * @returns {HTMLElement|null} - The element or null if not found
  */
 function safeGetElement(id) {
-    const element = document.getElementById(id);
-    if (!element) {
-        console.warn(`Element with id "${id}" not found`);
-    }
-    return element;
+    return document.getElementById(id);
 }
 
 /**
@@ -51,46 +47,46 @@ function escapeHTML(text) {
  */
 function createNewsCardSafe(article) {
     const { title, description, source_id, image_url, link } = article;
-    
+
     // Create card container
     const card = document.createElement('div');
     card.className = 'news-card';
-    
+
     // Create image container
     const imageDiv = document.createElement('div');
     imageDiv.className = 'news-image';
-    
+
     const img = document.createElement('img');
     img.alt = title || 'News image';
-    
+
     // Set image with error handling
     if (image_url && typeof image_url === 'string') {
         img.src = image_url;
-        img.onerror = function() {
+        img.onerror = function () {
             this.src = 'assets/placeholder.jpg'; // Fallback image
             this.onerror = null; // Prevent infinite loop
         };
     } else {
         img.src = 'assets/placeholder.jpg';
     }
-    
+
     imageDiv.appendChild(img);
     card.appendChild(imageDiv);
-    
+
     // Create content container
     const contentDiv = document.createElement('div');
     contentDiv.className = 'news-content';
-    
+
     // Add title
     const titleH1 = document.createElement('h1');
     titleH1.textContent = title || 'No title available';
     contentDiv.appendChild(titleH1);
-    
+
     // Add description
     const descP = document.createElement('p');
     descP.textContent = description || 'No description available';
     contentDiv.appendChild(descP);
-    
+
     // Add source
     const sourceP = document.createElement('p');
     const sourceStrong = document.createElement('strong');
@@ -98,14 +94,14 @@ function createNewsCardSafe(article) {
     sourceP.appendChild(sourceStrong);
     sourceP.appendChild(document.createTextNode(source_id || 'Unknown'));
     contentDiv.appendChild(sourceP);
-    
+
     // Add read more section
     const readMoreDiv = document.createElement('div');
     readMoreDiv.className = 'read-more';
-    
+
     const hr = document.createElement('hr');
     readMoreDiv.appendChild(hr);
-    
+
     // Validate and add link
     if (link && isValidURL(link)) {
         const linkA = document.createElement('a');
@@ -120,10 +116,10 @@ function createNewsCardSafe(article) {
         noLinkSpan.style.color = '#999';
         readMoreDiv.appendChild(noLinkSpan);
     }
-    
+
     contentDiv.appendChild(readMoreDiv);
     card.appendChild(contentDiv);
-    
+
     return card;
 }
 
@@ -142,7 +138,7 @@ function getPlaceholderImage() {
  */
 function showLoading(container) {
     if (!container) return;
-    
+
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'loading-indicator';
     loadingDiv.innerHTML = '<div class="spinner"></div><p>Loading news...</p>';
@@ -167,20 +163,20 @@ function hideLoading() {
  */
 function showError(message, container) {
     if (!container) return;
-    
+
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.style.cssText = 'padding: 20px; background: #fee; border: 1px solid #fcc; border-radius: 5px; margin: 20px; color: #c00;';
-    
+
     const errorText = document.createElement('p');
     errorText.textContent = message;
     errorDiv.appendChild(errorText);
-    
+
     const retryBtn = document.createElement('button');
     retryBtn.textContent = 'Retry';
     retryBtn.style.cssText = 'margin-top: 10px; padding: 8px 16px; cursor: pointer;';
     retryBtn.onclick = () => window.location.reload();
     errorDiv.appendChild(retryBtn);
-    
+
     container.appendChild(errorDiv);
 }
