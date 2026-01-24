@@ -12,7 +12,7 @@ document.getElementById("date").innerHTML = `<h4>${day}, ${mname} ${date}, ${yea
 
 // ⚠️ CONFIGURATION - Update with your deployment URL
 // After deploying to Vercel, update this URL with your actual deployment
-// Current: Pre-configured for http://news-website-kohl-chi.vercel.app
+// Current: Pre-configured for https://news-website-kohl-chi.vercel.app
 const VERCEL_FUNCTION_URL = 'https://news-website-kohl-chi.vercel.app/api/news';
 
 // APPLICATION SETTINGS
