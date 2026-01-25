@@ -142,7 +142,9 @@ Now you need to update the code to use YOUR Vercel URL:
    - News articles load correctly
 6. ✅ Success! Your site is secure and live!
 
-> **Reference:** See the [original demo](http://news-website-kohl-chi.vercel.app/) to compare functionality (but use your own deployment!)
+> **Want a custom domain?** See [docs/CUSTOM_DOMAIN.md](CUSTOM_DOMAIN.md) for instructions on setting up a custom subdomain like `news.yourdomain.com`.
+
+> **Reference:** See the [original demo](https://news.aparagarwal.tech/) to compare functionality (but use your own deployment!)
 
 ---
 

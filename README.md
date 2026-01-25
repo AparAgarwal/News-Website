@@ -31,13 +31,14 @@ A clean, modern, and secure news aggregation website built with HTML, CSS, and J
 
 ## 🚀 Live Demo
 
-> **Note:** This project uses a hybrid deployment strategy:
-> - **Frontend**: Hosted on GitHub Pages at custom domain
-> - **API Proxy**: Deployed on Vercel (keeps API key secure)
+> **Note:** This project is deployed on Vercel with a custom subdomain:
+> - **Primary Site**: Custom domain on Vercel (includes frontend + API)
+> - **API Proxy**: Vercel serverless function (keeps API key secure)
+> - **Backup**: GitHub Pages deployment (fallback)
 
-**Live Site:** [https://aparagarwal.tech/News-Website/](https://aparagarwal.tech/News-Website/)
+**Live Site:** [https://news.aparagarwal.tech/](https://news.aparagarwal.tech/)
 
-**Vercel API Demo:** [http://news-website-kohl-chi.vercel.app/](http://news-website-kohl-chi.vercel.app/)
+**GitHub Pages (Backup):** [https://aparagarwal.tech/News-Website/](https://aparagarwal.tech/News-Website/)
 
 > To deploy your own instance, you'll need your own NewsData.io API key and Vercel deployment. See [Installation & Setup](#-installation--setup) below.
 
@@ -45,8 +46,9 @@ A clean, modern, and secure news aggregation website built with HTML, CSS, and J
 
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
 - **API:** [NewsData.io](https://newsdata.io/)
-- **Frontend Hosting:** GitHub Pages (custom domain)
+- **Hosting:** Vercel (custom subdomain `news.aparagarwal.tech`)
 - **API Proxy:** Vercel Serverless Functions
+- **Backup Hosting:** GitHub Pages
 
 ## 📁 Project Structure
 

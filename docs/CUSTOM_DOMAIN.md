@@ -1,84 +1,116 @@
 
 ## 📄 Custom Domain Deployment Guide
 
-**Deploying to GitHub Pages with Custom Domain + Vercel API Proxy**
+**Deploying to Vercel with Custom Subdomain**
 
-This guide is specifically for the hybrid deployment configuration used by this project.
+This guide shows how to deploy the News Website to a custom subdomain using Vercel.
 
 ### Architecture
 
 ```
-Custom Domain (aparagarwal.tech/News-Website/) [GitHub Pages]
-    ↓  
-    Requests to → Vercel API Proxy (news-website-kohl-chi.vercel.app/api/news)
+Custom Subdomain (news.aparagarwal.tech) [Vercel]
+    ├── Frontend (HTML/CSS/JS)
+    └── API Proxy (/api/news)
         ↓
         Fetches from → NewsData.io API (with secure API key)
 ```
 
+### Prerequisites
+
+- A domain name you own (e.g., `aparagarwal.tech`)
+- Access to your domain's DNS settings
+- Vercel account (free tier works)
+- NewsData.io API key
+
 ### Steps
 
-1. **Deploy API to Vercel** (follow main deployment steps 1-5)
+**1. Deploy to Vercel**
 
-2. **Enable GitHub Pages:**
-   - Repository Settings → Pages
-   - Source: `main` branch
-   - Folder: `/ (root)`
-   - Custom domain: Your domain (if configured in DNS)
+Follow the main [DEPLOYMENT.md](DEPLOYMENT.md) guide to:
+- Fork the repository
+- Deploy to Vercel with your `NEWS_API_KEY` environment variable
+- Get your Vercel deployment URL (e.g., `news-website-abc123.vercel.app`)
 
-3.**Verify Configuration:**
-   
-   The project is pre-configured for custom domain deployment:
-   
-   **Base Href** (all HTML files):
-   ```html
-   <base href="/News-Website/">
-   ```
-   
-   **CORS Allowed Origins** (`api/news.js`):
-   ```javascript
-   const allowedOrigins = [
-       'https://aparagarwal.tech',
-       'https://aparagarwal.github.io',
-       'http://localhost:5500',
-       // ... more origins
-   ];
-   ```
+**2. Add Custom Domain in Vercel**
 
-4. **Test Deployment:**
-   - Visit `https://your-domain.com/News-Website/`
-   - Open DevTools (F12) → Network tab
-   - Verify API requests succeed
-   - Check for CORS errors
+1. Go to your Vercel project dashboard
+2. Click **Settings** → **Domains**
+3. Add your custom subdomain: `news.aparagarwal.tech`
+4. Vercel will show DNS configuration instructions
 
-### Customization
+**3. Configure DNS**
 
-**For Your Own Domain:**
+In your domain registrar/DNS provider (where `aparagarwal.tech` is hosted):
 
-1. Update `allowedOrigins` in `api/news.js`:
-   ```javascript
-   const allowedOrigins = [
-       'https://your-custom-domain.com',
-       // ... keep other origins
-   ];
-   ```
+Add a CNAME record:
+```
+Type:  CNAME
+Name:  news
+Value: cname.vercel-dns.com
+TTL:   Auto or 3600
+```
 
-2. Redeploy to Vercel
+**4. Update CORS Configuration**
 
-3. Configure your custom domain DNS:
-   - CNAME record pointing to `username.github.io`
+Edit `api/news.js` and add your custom domain to allowed origins:
+
+```javascript
+const allowedOrigins = [
+    'https://news.aparagarwal.tech', // Your custom subdomain
+    'https://aparagarwal.tech',
+    'https://aparagarwal.github.io',
+    // ... other origins
+];
+```
+
+Commit and push changes:
+```bash
+git add api/news.js
+git commit -m "Add custom domain to CORS origins"
+git push
+```
+
+Vercel will automatically redeploy.
+
+**5. Verify Deployment**
+
+1. Wait for DNS propagation (can take 5 minutes to 48 hours, usually ~10 minutes)
+2. Visit your custom domain: `https://news.aparagarwal.tech`
+3. Open DevTools (F12) → Network tab
+4. Verify:
+   - Page loads correctly
+   - News articles display
+   - No CORS errors
+   - API calls go to your custom domain
+
+### Multiple Deployments
+
+You can maintain both:
+- **Primary**: `https://news.aparagarwal.tech` (Vercel custom domain)
+- **Backup**: `https://aparagarwal.tech/News-Website/` (GitHub Pages)
+
+Both will work if you keep both domains in the CORS `allowedOrigins` array.
 
 ### Troubleshooting
 
-**CORS Errors:**
-- Ensure your domain is in `allowedOrigins` array
-- Redeploy Vercel after updating CORS settings
+**DNS not propagating:**
+- Check DNS configuration with: `nslookup news.aparagarwal.tech`
+- Wait up to 48 hours (usually much faster)
+- Clear browser DNS cache
 
-**Assets Not Loading:**
-- Verify `<base href="/News-Website/">` in all HTML files
-- Check GitHub Pages deployment status
+**CORS Errors:**
+- Ensure your custom domain is in `allowedOrigins` array in `api/news.js`
+- Redeploy on Vercel after updating CORS settings
+- Check browser console for specific error message
+
+**SSL Certificate Issues:**
+- Vercel automatically provisions SSL certificates
+- Wait a few minutes after adding the domain
+- Check Vercel dashboard for certificate status
 
 **API Not Responding:**
-- Verify `NEWS_API_KEY` in Vercel environment variables
-- Check Vercel function logs for errors
+- Verify `NEWS_API_KEY` environment variable is set in Vercel
+- Check Vercel function logs: Project → Logs
+- Test API directly: `https://news.aparagarwal.tech/api/news?country=us`
 
 ---
