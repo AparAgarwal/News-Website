@@ -1,6 +1,7 @@
 export default async function handler(req, res) {
     const allowedOrigins = [
-        // Production domains (change these to your production domains)
+        // Production domains
+        'https://news.aparagarwal.tech', // Custom subdomain (primary)
         'https://aparagarwal.tech',
         'https://aparagarwal.github.io',
         'http://news-website-kohl-chi.vercel.app',
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
     if (allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     }
-    
+
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
 
     try {
         const apiKey = process.env.NEWS_API_KEY;
-        
+
         if (!apiKey) {
             return res.status(500).json({ error: 'API key not configured' });
         }
@@ -51,12 +52,12 @@ export default async function handler(req, res) {
         const apiUrl = `${baseUrl}?${params.toString()}`;
 
         const response = await fetch(apiUrl);
-        
+
         if (!response.ok) {
             const errorText = await response.text();
-            return res.status(response.status).json({ 
+            return res.status(response.status).json({
                 error: 'Failed to fetch news',
-                details: errorText 
+                details: errorText
             });
         }
 
@@ -64,9 +65,9 @@ export default async function handler(req, res) {
         return res.status(200).json(data);
 
     } catch (error) {
-        return res.status(500).json({ 
+        return res.status(500).json({
             error: 'Internal server error',
-            message: error.message 
+            message: error.message
         });
     }
 }
