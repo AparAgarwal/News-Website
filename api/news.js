@@ -1,9 +1,11 @@
 export default async function handler(req, res) {
     const allowedOrigins = [
+        // Production domains (change these to your production domains)
         'https://aparagarwal.tech',
         'https://aparagarwal.github.io',
         'http://news-website-kohl-chi.vercel.app',
         'https://news-website-kohl-chi.vercel.app',
+        // Localhost for development
         'http://localhost:5500',
         'http://127.0.0.1:5500',
         'http://localhost:3000',

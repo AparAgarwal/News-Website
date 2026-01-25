@@ -17,15 +17,17 @@ A clean, modern, and secure news aggregation website built with HTML, CSS, and J
 
 ## 🌟 Features
 
+- **Single-Page Application** - Modern SPA architecture with URL parameter routing
 - **Real-time News Updates** - Fetches latest news from NewsData.io API
 - **Multiple Categories** - Home, International, Business, Sports, Entertainment, Technology
-- **Search Functionality** - Search news by keywords
+- **Search Functionality** - Search news by keywords with dedicated results view
 - **Responsive Design** - Mobile-friendly interface that works on all devices
 - **Load More** - Pagination support for browsing more articles
 - **Security Hardened** - Protected against XSS, open redirects, and other vulnerabilities
 - **Error Handling** - Graceful error messages with retry functionality
 - **Image Fallbacks** - Placeholder images for broken URLs
 - **Loading States** - Visual feedback during data fetching
+- **Clean URLs** - SEO-friendly URLs with category parameters (`/?category=business`)
 
 ## 🚀 Live Demo
 
@@ -50,13 +52,7 @@ A clean, modern, and secure news aggregation website built with HTML, CSS, and J
 
 ```
 News-Website/
-├── index.html              # Home page
-├── business.html           # Business news page
-├── entertainment.html      # Entertainment news page
-├── international.html      # International news page
-├── sports.html            # Sports news page
-├── technology.html        # Technology news page
-├── search-results.html    # Search results page
+├── index.html              # Single-page application (all categories)
 ├── README.md              # Project documentation
 ├── .gitignore            # Git ignore rules
 ├── .env.example          # Environment variables template
@@ -66,7 +62,7 @@ News-Website/
 │   └── news.js          # API proxy for secure requests
 │
 ├── js/                   # JavaScript files
-│   ├── script.js        # Main application logic
+│   ├── script.js        # Main application logic with URL routing
 │   └── utils.js         # Utility and security functions
 │
 ├── css/                  # Stylesheets
@@ -75,11 +71,25 @@ News-Website/
 ├── assets/              # Static assets
 │   ├── favicon_io/      # Favicon files
 │   ├── icon.png        # Site icon
-│   └── logo.png        # Site logo
+│   ├── logo.png        # Site logo
+│   └── placeholder.svg  # Fallback image for broken URLs
 │
 └── docs/                # Documentation
-    └── DEPLOYMENT.md    # Deployment guide
+    ├── DEPLOYMENT.md    # Deployment guide
+    ├── LOCAL_SETUP.md   # Local development setup
+    ├── ENVIRONMENT.md   # Environment configuration
+    └── CUSTOM_DOMAIN.md # Custom domain setup
 ```
+
+### Architecture Notes
+
+**Single-Page Application (SPA):**  
+The app uses URL parameters for routing instead of multiple HTML files:
+- Home: `/` or `/?category=home`
+- Categories: `/?category=business`, `/?category=sports`, etc.
+- Search: `/?q=query`
+
+JavaScript dynamically loads content based on URL parameters, eliminating code duplication and improving maintainability.
 
 ## 🔧 Installation & Setup
 
@@ -201,9 +211,9 @@ Modify `css/style.css` to customize the appearance:
 
 ### Categories
 Add new categories by:
-1. Creating a new HTML page (e.g., `category.html`)
-2. Adding navigation link in all HTML files
-3. Updating `js/script.js` category mapping
+1. Adding navigation link to `index.html` with `data-category` attribute
+2. Adding category title mapping to `updatePageTitle()` function in `js/script.js`
+3. Adding category API mapping if needed (e.g., `international` → `world`)
 
 ## 📱 Browser Support
 
@@ -252,6 +262,15 @@ This project is open source and available under the [MIT License](LICENSE).
 - [API Documentation](https://newsdata.io/documentation) - NewsData.io API docs
 
 ## 🔄 Changelog
+
+### Version 3.0.0 (January 2026)
+- 🚀 **Major Refactor:** Converted to Single-Page Application (SPA)
+- ✨ Implemented URL parameter-based routing
+- ✨ Reduced codebase by 86% (7 HTML files → 1 HTML file)
+- ✨ Added dynamic navigation state management
+- ✨ Improved SEO with clean, descriptive URLs
+- ✨ Added search results view with hidden hero section
+- ✨ Enhanced maintainability with centralized layout
 
 ### Version 2.0.0 (2024)
 - ✨ Implemented comprehensive security fixes

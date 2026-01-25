@@ -35,9 +35,9 @@ Before setting up the project locally, ensure you have:
    - Your browser will open at `http://localhost:5500` (or similar)
 
 4. **Test the Site**
-   - Navigate through different categories
-   - Search for news articles
-   - Verify all features work correctly
+   - Navigate through different categories (each uses URL parameters like `/?category=business`)
+   - Search for news articles (redirects to `/?q=query`)
+   - Verify all features work correctly with the SPA routing
 
 > **Note:** The site will automatically use the Vercel-deployed API proxy for fetching news. The API key is securely stored in Vercel environment variables.
 
@@ -121,19 +121,24 @@ If you use a different local port, update the `allowedOrigins` array in `api/new
 - ✅ Navigation works
 - ✅ Date displays correctly
 
-### Category Pages
-- ✅ Business news loads
-- ✅ International news loads
-- ✅ Sports news loads
-- ✅ Entertainment news loads
-- ✅ Technology news loads
+### Category Navigation (URL Parameters)
+- ✅ Home (`/` or `/?category=home`) loads top news
+- ✅ Business (`/?category=business`) loads business news
+- ✅ International (`/?category=international`) loads world news
+- ✅ Sports (`/?category=sports`) loads sports news
+- ✅ Entertainment (`/?category=entertainment`) loads entertainment news
+- ✅ Technology (`/?category=technology`) loads technology news
+- ✅ Navigation active state updates based on URL
+- ✅ Page title updates based on category
 
-### Search Functionality
+### Search Functionality  
 - ✅ Search bar accepts input
 - ✅ Search button triggers search
 - ✅ Enter key triggers search
+- ✅ URL changes to `/?q=query`
 - ✅ Search results display correctly
-- ✅ Search results page shows query
+- ✅ Hero section hides on search results
+- ✅ Page title shows search query
 
 ### Load More Feature
 - ✅ Load More button appears
@@ -188,16 +193,10 @@ If you use a different local port, update the `allowedOrigins` array in `api/new
 
 ```
 News-Website/
-├── index.html              # Homepage
-├── business.html           # Business category
-├── entertainment.html      # Entertainment category  
-├── international.html      # International category
-├── sports.html            # Sports category
-├── technology.html        # Technology category
-├── search-results.html    # Search results page
+├── index.html              # Single-page application (all categories)
 │
 ├── js/
-│   ├── script.js          # Main application logic
+│   ├── script.js          # Main logic + URL routing
 │   └── utils.js           # Utility functions
 │
 ├── css/
@@ -210,8 +209,19 @@ News-Website/
 │
 └── docs/
     ├── DEPLOYMENT.md      # Deployment guide
-    └── LOCAL_SETUP.md     # This file
+    ├── LOCAL_SETUP.md     # This file
+    ├── ENVIRONMENT.md     # Environment setup
+    └── CUSTOM_DOMAIN.md   # Custom domain setup
 ```
+
+### Architecture Note
+
+The app uses **URL parameter routing** for navigation:
+- Home: `/` or `/?category=home`
+- Categories: `/?category=business`, `/?category=sports`, etc.
+- Search: `/?q=earthquake`
+
+JavaScript dynamically loads content based on URL parameters, eliminating the need for multiple HTML files.
 
 ## 🔒 Security Notes
 
@@ -252,11 +262,23 @@ News-Website/
 
 ### Adding a New Category
 
-1. Create new HTML file (e.g., `politics.html`)
-2. Copy structure from existing category page
-3. Update the active navigation link  
-4. Add to navigation in all HTML files
-5. Update category mapping in `js/script.js`
+1. Edit `index.html` - Add navigation link:
+   ```html
+   <li><a href="/?category=yourcategory" data-category="yourcategory">Your Category</a></li>
+   ```
+
+2. Edit `js/script.js` - Add to `updatePageTitle()` function:
+   ```javascript
+   const categoryTitles = {
+       'home': 'Breaking News',
+       // ... existing categories ...
+       'yourcategory': 'Your Category News'
+   };
+   ```
+
+3. Add API mapping if needed (e.g., map to specific API category)
+
+4. Test locally: Visit `/?category=yourcategory`
 
 ### Changing Colors/Styles
 

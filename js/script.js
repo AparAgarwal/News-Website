@@ -8,6 +8,69 @@ let date = d.getDate();
 let year = d.getFullYear();
 document.getElementById("date").innerHTML = `<h4>${day}, ${mname} ${date}, ${year}</h4><span>Today's Paper</span>`;
 
+// ===== URL PARAMETER ROUTING HELPER FUNCTIONS =====
+
+/**
+ * Gets the category from URL parameter
+ * @returns {string} - The category name (home, business, sports, etc.)
+ */
+function getCategoryFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get('category');
+    return category || 'home';
+}
+
+/**
+ * Checks if current page is displaying search results
+ * @returns {boolean}
+ */
+function isSearchPage() {
+    const params = new URLSearchParams(window.location.search);
+    return params.has('q');
+}
+
+/**
+ * Updates the navigation active state based on current category
+ */
+function updateNavigationActiveState() {
+    const currentCategory = getCategoryFromURL();
+    const navLinks = document.querySelectorAll('nav ul li a');
+
+    navLinks.forEach(link => {
+        const linkCategory = link.getAttribute('data-category');
+        if (linkCategory === currentCategory) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Updates the page title based on current category or search query
+ */
+function updatePageTitle() {
+    const params = new URLSearchParams(window.location.search);
+    const searchQuery = params.get('q');
+
+    if (searchQuery) {
+        document.title = `The News Today - Search Results for "${searchQuery}"`;
+        return;
+    }
+
+    const category = getCategoryFromURL();
+    const categoryTitles = {
+        'home': 'Breaking News',
+        'international': 'International News',
+        'business': 'Business News',
+        'sports': 'Sports News',
+        'entertainment': 'Entertainment News',
+        'technology': 'Technology News'
+    };
+
+    document.title = `The News Today - ${categoryTitles[category] || 'Breaking News'}`;
+}
+
 // Fetching the news from the API
 
 // ⚠️ CONFIGURATION - Update with your deployment URL
@@ -21,8 +84,7 @@ const maxNews = 12;
 const loadMoreCount = 6;
 const MAX_ARTICLES = 100; // Prevent memory issues
 
-const activeElement = document.querySelector('.active');
-const active = activeElement ? activeElement.textContent.toLowerCase() : 'home';
+const active = getCategoryFromURL();
 const category = active === 'home' ? 'top' : active === 'international' ? 'world' : active;
 
 let nextPageToken = '';
@@ -236,8 +298,6 @@ if (loadMoreBtn) {
 
             const articlesToDisplay = allArticles.slice(displayedCount, displayedCount + loadMoreCount);
 
-            console.log(allArticles); // Debugging
-
             displayArticles(articlesToDisplay);
             displayedCount += articlesToDisplay.length;
 
@@ -255,14 +315,24 @@ if (loadMoreBtn) {
     });
 }
 
-// search functionality
+// search functionality and initialization
 document.addEventListener('DOMContentLoaded', function () {
+    // Update navigation active state and page title
+    updateNavigationActiveState();
+    updatePageTitle();
+
     const params = new URLSearchParams(window.location.search);
     const searchQuery = params.get('q');
     if (searchQuery) {
-        const searchLabel = safeGetElement('search-results-label');
-        if (searchLabel) {
-            searchLabel.textContent = `Search Results for "${searchQuery}"`;
+        // Handle search results - hide hero section, show only news cards
+        const heroContent = document.querySelector('.hero-content');
+        if (heroContent) {
+            heroContent.style.display = 'none';
+        }
+
+        const newsLabel = document.querySelector('.news-label');
+        if (newsLabel) {
+            newsLabel.textContent = `Search Results for "${searchQuery}"`;
         }
         const searchQueryInput = safeGetElement('search-query');
         if (searchQueryInput) {
@@ -270,6 +340,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         init(searchQuery);
     } else {
+        // Handle normal category page - ensure hero section is visible
+        const heroContent = document.querySelector('.hero-content');
+        if (heroContent) {
+            heroContent.style.display = '';
+        }
         init();
     }
 });
@@ -282,7 +357,7 @@ if (searchButton) {
             const query = searchQueryInput.value.trim();
             if (query) {
                 searchQueryInput.value = '';
-                window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
+                window.location.href = `/?q=${encodeURIComponent(query)}`;
             }
         }
     });
@@ -295,7 +370,7 @@ if (searchQueryInput) {
             const query = searchQueryInput.value.trim();
             if (query) {
                 searchQueryInput.value = '';
-                window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
+                window.location.href = `/?q=${encodeURIComponent(query)}`;
             }
         }
     });
